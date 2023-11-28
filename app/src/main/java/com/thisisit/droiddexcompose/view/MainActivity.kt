@@ -37,6 +37,11 @@ class MainActivity : ComponentActivity() {
             Homepage()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        mainViewModel.fetchPokemonList()
+    }
 }
 
 @Composable
