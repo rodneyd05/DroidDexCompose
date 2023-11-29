@@ -24,7 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
 import com.thisisit.droiddexcompose.R
 import com.thisisit.droiddexcompose.model.PokemonDetails
 import com.thisisit.droiddexcompose.viewmodel.MainViewModel
@@ -63,7 +62,7 @@ fun FeaturedPokemon() {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxSize(0.3f)
-            .padding(5.dp)
+            .padding(10.dp)
     ) {
         Text(modifier = Modifier
             .padding(10.dp),
@@ -113,7 +112,8 @@ fun OtherRegion() {
     val mainViewModel = viewModel<MainViewModel>()
     mainViewModel.fetchPokemonList()
 
-    val pokemonList = mainViewModel.pokemonList
+    //calling this updates the state of responseList in MainViewModel
+    mainViewModel.globalPokemonList
 
     val pokemonDetailsList = mainViewModel.globalPokemonDetailsList
 

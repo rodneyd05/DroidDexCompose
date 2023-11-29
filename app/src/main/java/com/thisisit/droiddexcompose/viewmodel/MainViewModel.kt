@@ -14,7 +14,7 @@ import retrofit2.Response
 
 class MainViewModel : ViewModel() {
 
-    var pokemonList by mutableStateOf(emptyList<Pokemon>())
+    var globalPokemonList by mutableStateOf(emptyList<Pokemon>())
         private set
 
     var globalPokemonDetailsList by mutableStateOf(emptyList<PokemonDetails>())
@@ -41,16 +41,15 @@ class MainViewModel : ViewModel() {
                     val responseList = response.body()?.results
 
                     responseList?.let {
-                        pokemonList = responseList
+                        globalPokemonList = responseList
 
                         for (pokemon in responseList) {
                             fetchPokemonDetails(pokemon.url)
                         }
-
-                        //Let's sort them before assigning dude!
-                        val sortedList = mutablePokemonDetailsList.sortedBy { it.id }
-                        globalPokemonDetailsList = sortedList
                     }
+
+                    //Let's sort them before assigning dude!
+                    globalPokemonDetailsList = mutablePokemonDetailsList.sortedBy { it.id }
                 }
             }
 
