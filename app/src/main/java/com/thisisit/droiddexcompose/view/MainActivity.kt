@@ -3,7 +3,6 @@ package com.thisisit.droiddexcompose.view
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,35 +11,32 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
 import com.thisisit.droiddexcompose.R
+import com.thisisit.droiddexcompose.model.PokemonDetails
 import com.thisisit.droiddexcompose.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val mainViewModel by viewModels<MainViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //initialize the value of Model
-        mainViewModel.fetchPokemonList()
 
         setContent {
             Homepage()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mainViewModel.fetchPokemonList()
     }
 }
 
@@ -67,8 +63,12 @@ fun FeaturedPokemon() {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxSize(0.3f)
-            .padding(20.dp)
+            .padding(5.dp)
     ) {
+        Text(modifier = Modifier
+            .padding(10.dp),
+            fontSize = 20.sp,
+            text = "Featured Pokemon")
 
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -81,7 +81,9 @@ fun FeaturedPokemon() {
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Image(
-                    modifier = Modifier.fillMaxSize(0.8f),
+                    modifier = Modifier
+                        .fillMaxSize(0.9f)
+                        .padding(5.dp),
                     painter = painterResource(id = R.drawable.whos_that_pokemon_logo),
                     contentDescription = "default_pokemon_image"
                 )
@@ -93,10 +95,7 @@ fun FeaturedPokemon() {
             ) {
                 Text(text = "Name:")
                 Text(text = "ID:")
-                Text(text = "Type:")
-                Text(text = "Evolution:")
-                Text(text = "Effective:")
-                Text(text = "Weakness:")
+                Text(text = "Height:")
             }
         }
     }
@@ -112,24 +111,48 @@ fun OtherRegion() {
     //Since we want to create an instance here in a composable and it is not accessible here, we add dependency
     //implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2"
     val mainViewModel = viewModel<MainViewModel>()
+    mainViewModel.fetchPokemonList()
 
-    val updatedPokemonList = mainViewModel.globalPokemonList
+    val pokemonList = mainViewModel.pokemonList
 
-    Card(
+    val pokemonDetailsList = mainViewModel.globalPokemonDetailsList
+
+    RecyclerView(pokemonList = pokemonDetailsList)
+}
+
+@Composable
+fun PokemonItem(pokemonDetails: PokemonDetails) {
+    Surface(
+        color =  MaterialTheme.colorScheme.onPrimary,
         modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+            .fillMaxWidth()
+            .padding(10.dp)
     ) {
 
-        Column {
+        Row(modifier = Modifier
+            .fillMaxWidth()) {
+            Image(
+                modifier = Modifier
+                    .fillMaxSize(0.5f)
+                    .padding(20.dp),
+                painter = painterResource(id = R.drawable.whos_that_pokemon_logo),
+                contentDescription = "default_pokemon_image"
+            )
 
-            for (pokemonName in updatedPokemonList) {
-                Text(text = pokemonName)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Name: ${pokemonDetails.name}")
+                Text(text = "ID: ${pokemonDetails.id}")
+                Text(text = "Height: ${pokemonDetails.height}")
             }
+        }
+    }
+}
 
-            if (updatedPokemonList.isEmpty()) {
-                Text(text = "Loading...")
-            }
+@Composable
+fun RecyclerView(pokemonList: List<PokemonDetails>) {
+    LazyColumn(modifier = Modifier.padding(10.dp)) {
+        items(items = pokemonList) { pokemon ->
+            PokemonItem(pokemonDetails = pokemon)
         }
     }
 }

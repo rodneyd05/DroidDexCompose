@@ -4,20 +4,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.thisisit.droiddexcompose.model.Pokemon
+import com.thisisit.droiddexcompose.model.PokemonDetails
 import com.thisisit.droiddexcompose.model.PokemonListResponse
 import com.thisisit.droiddexcompose.model.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
-    var globalPokemonList by mutableStateOf(emptyList<String>())
+    var pokemonList by mutableStateOf(emptyList<Pokemon>())
         private set
+
+    var globalPokemonDetailsList by mutableStateOf(emptyList<PokemonDetails>())
+        private set
+
+    //this variable accepts every details and pass it in a mutableState
+    private val mutablePokemonDetailsList = mutableListOf<PokemonDetails>()
 
     fun fetchPokemonList() {
 
-        val nameList = mutableListOf<String>()
+        //avoid duplicate items
+        mutablePokemonDetailsList.clear()
 
         val call = RetrofitClient.pokemonApiService.getPokemonList()
 
@@ -27,45 +36,59 @@ class MainViewModel: ViewModel() {
                 response: Response<PokemonListResponse>
             ) {
                 if (response.isSuccessful) {
-                    val pokemonList = response.body()?.results
-                    pokemonList?.let {
-                        for (pokemon in it) {
 
-                            //fetchPokemonDetails(pokemon.url)
-                            nameList.add(pokemon.name)
+                    //assign fourth constructor of PokemonListResponse(results) to responseList
+                    val responseList = response.body()?.results
+
+                    responseList?.let {
+                        pokemonList = responseList
+
+                        for (pokemon in responseList) {
+                            fetchPokemonDetails(pokemon.url)
                         }
+
+                        //Let's sort them before assigning dude!
+                        val sortedList = mutablePokemonDetailsList.sortedBy { it.id }
+                        globalPokemonDetailsList = sortedList
                     }
                 }
-
-                //assign the values of nameList to pokemonList
-                globalPokemonList = nameList
             }
 
             override fun onFailure(call: Call<PokemonListResponse>, t: Throwable) {
                 // Handle failure
-                fetchPokemonList()
             }
         })
     }
 
-//    private fun fetchPokemonDetails(url: String) {
-//        val call = RetrofitClient.pokemonApiService.getPokemonDetails(url)
-//
-//        call.enqueue(object : Callback<Pokemon> {
-//            override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
-//                if (response.isSuccessful) {
-//                    val pokemon = response.body()
-//                    pokemon?.let {
-//                        // Process the Pokemon details
-//                        println("Name: ${it.name}, URL: ${it.url}")
-//                    }
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<Pokemon>, t: Throwable) {
-//                // Handle failure
-//            }
-//        })
-//    }
+    fun fetchPokemonDetails(url: String) {
+
+        val call = RetrofitClient.pokemonApiService.getPokemonDetails(url)
+
+        call.enqueue(object : Callback<PokemonDetails> {
+            override fun onResponse(
+                call: Call<PokemonDetails>,
+                response: Response<PokemonDetails>
+            ) {
+                if (response.isSuccessful) {
+                    val pokemonDetails = response.body()
+
+                    pokemonDetails?.let {
+                        val thisPokemon = PokemonDetails(
+                            it.name,
+                            it.height,
+                            it.id,
+                            it.sprites
+                        )
+
+                        mutablePokemonDetailsList.add(thisPokemon)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<PokemonDetails>, t: Throwable) {
+                // Handle failure
+            }
+        })
+    }
 
 }
