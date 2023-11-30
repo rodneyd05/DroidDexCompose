@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -139,12 +140,16 @@ fun PokemonItem(pokemonDetails: PokemonDetails) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .scale(0.8f),
                 model = pokemonDetails.sprites.other.official_artwork.front_default,
                 contentDescription = pokemonDetails.name
             )
 
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)) {
                 Text(text = "Name: ${pokemonDetails.name}")
                 Text(text = "ID: ${pokemonDetails.id}")
                 Text(text = "Height: ${pokemonDetails.height}")
