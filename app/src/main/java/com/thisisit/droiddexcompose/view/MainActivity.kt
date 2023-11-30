@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.thisisit.droiddexcompose.model.PokemonDetails
+import com.thisisit.droiddexcompose.ui.theme.DroidDexComposeTheme
 import com.thisisit.droiddexcompose.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +35,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Homepage()
+            DroidDexComposeTheme {
+                Homepage()
+            }
         }
     }
 }
@@ -139,7 +142,7 @@ fun PokemonItem(pokemonDetails: PokemonDetails) {
             //implementation "io.coil-kt:coil-compose:2.4.0"
             AsyncImage(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.4f)
                     .padding(5.dp)
                     .scale(0.8f),
                 model = pokemonDetails.sprites.other.official_artwork.front_default,
