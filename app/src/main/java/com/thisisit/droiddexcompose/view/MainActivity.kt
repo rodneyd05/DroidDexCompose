@@ -20,16 +20,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.thisisit.droiddexcompose.R
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.thisisit.droiddexcompose.model.PokemonDetails
 import com.thisisit.droiddexcompose.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,7 +47,8 @@ class MainActivity : ComponentActivity() {
 fun Homepage() {
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         FeaturedPokemon()
         OtherRegion()
@@ -64,10 +64,12 @@ fun FeaturedPokemon() {
             .fillMaxSize(0.3f)
             .padding(10.dp)
     ) {
-        Text(modifier = Modifier
-            .padding(10.dp),
+        Text(
+            modifier = Modifier
+                .padding(10.dp),
             fontSize = 20.sp,
-            text = "Featured Pokemon")
+            text = "Featured Pokemon"
+        )
 
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -79,12 +81,11 @@ fun FeaturedPokemon() {
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Bottom
             ) {
+
+                //Only 1 image is shown, image is not loaded async
                 Image(
-                    modifier = Modifier
-                        .fillMaxSize(0.9f)
-                        .padding(5.dp),
-                    painter = painterResource(id = R.drawable.whos_that_pokemon_logo),
-                    contentDescription = "default_pokemon_image"
+                    painter = rememberAsyncImagePainter("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"),
+                    contentDescription = "featured_pokemon_image"
                 )
             }
             Column(
@@ -92,9 +93,10 @@ fun FeaturedPokemon() {
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "Name:")
-                Text(text = "ID:")
-                Text(text = "Height:")
+                Text(text = "Name: Pikachu")
+                Text(text = "ID: 25")
+                Text(text = "Height: 4")
+                Text(text = "Weight: 60")
             }
         }
     }
@@ -123,26 +125,30 @@ fun OtherRegion() {
 @Composable
 fun PokemonItem(pokemonDetails: PokemonDetails) {
     Surface(
-        color =  MaterialTheme.colorScheme.onPrimary,
+        color = MaterialTheme.colorScheme.onPrimary,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(10.dp)
     ) {
-
-        Row(modifier = Modifier
-            .fillMaxWidth()) {
-            Image(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            //Used v2.4.0
+            //implementation "io.coil-kt:coil-compose:2.4.0"
+            AsyncImage(
                 modifier = Modifier
-                    .fillMaxSize(0.5f)
-                    .padding(20.dp),
-                painter = painterResource(id = R.drawable.whos_that_pokemon_logo),
-                contentDescription = "default_pokemon_image"
+                    .fillMaxWidth(0.5f)
+                    .padding(5.dp),
+                model = pokemonDetails.sprites.other.official_artwork.front_default,
+                contentDescription = pokemonDetails.name
             )
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(text = "Name: ${pokemonDetails.name}")
                 Text(text = "ID: ${pokemonDetails.id}")
                 Text(text = "Height: ${pokemonDetails.height}")
+                Text(text = "Weight: ${pokemonDetails.weight}")
             }
         }
     }

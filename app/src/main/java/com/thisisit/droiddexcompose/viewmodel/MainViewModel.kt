@@ -76,7 +76,8 @@ class MainViewModel : ViewModel() {
                             it.name,
                             it.height,
                             it.id,
-                            it.sprites
+                            it.sprites,
+                            it.weight
                         )
 
                         mutablePokemonDetailsList.add(thisPokemon)

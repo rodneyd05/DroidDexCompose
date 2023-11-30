@@ -11,7 +11,8 @@ data class PokemonDetails(
     val name: String,
     val height: Int,
     val id: Int,
-    val sprites: Sprites
+    val sprites: Sprites,
+    val weight: Int
 )
 
 data class Sprites(
