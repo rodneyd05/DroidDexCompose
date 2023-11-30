@@ -1,9 +1,12 @@
 package com.thisisit.droiddexcompose.view
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,31 +40,30 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             DroidDexComposeTheme {
-                Homepage()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    val context = this@MainActivity
+                    FeaturedPokemon()
+                    PokemonLazyColumn(context)
+                }
             }
         }
     }
+
+    companion object {
+        const val PASS_DETAILS = "pass"
+    }
 }
 
+//Top part of the Homepage(Featured Pokemon)
 @Composable
 //For duplicate class error
 //build.gradle(Project) is set to
 //id 'org.jetbrains.kotlin.android' version '1.8.10' apply false
 //build.gradle(app)
 //kotlinCompilerExtensionVersion '1.4.3'
-fun Homepage() {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        FeaturedPokemon()
-        OtherRegion()
-    }
-}
-
-//Top part of the Homepage(Featured Pokemon)
-@Composable
 fun FeaturedPokemon() {
     Card(
         modifier = Modifier
@@ -106,9 +109,8 @@ fun FeaturedPokemon() {
     }
 }
 
-//Region intended for recyclerview
 @Composable
-fun OtherRegion() {
+fun PokemonLazyColumn(context: Context) {
 
     //we can create an instance of viewModel inside the MainActivity by using this code
     //private val mainViewModel by viewModels<MainViewModel>()
@@ -123,7 +125,23 @@ fun OtherRegion() {
 
     val pokemonDetailsList = mainViewModel.globalPokemonDetailsList
 
-    RecyclerView(pokemonList = pokemonDetailsList)
+    LazyColumn(modifier = Modifier.padding(10.dp)) {
+        items(items = pokemonDetailsList) { pokemonDetails ->
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(onClick = {
+                        //Open DetailsActivity
+                        val intent = Intent(context, DetailsActivity::class.java)
+                        intent.putExtra(MainActivity.PASS_DETAILS, pokemonDetails)
+                        context.startActivity(intent)
+                    })
+            ) {
+                PokemonItem(pokemonDetails)
+            }
+        }
+    }
 }
 
 @Composable
@@ -152,21 +170,21 @@ fun PokemonItem(pokemonDetails: PokemonDetails) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)) {
-                Text(text = "Name: ${pokemonDetails.name}")
+                    .padding(10.dp)
+            ) {
+                //Name
+                val name = pokemonDetails.name
+
+                Text(
+                    text = name[0].uppercase() + name.substring(1, name.length),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+
                 Text(text = "ID: ${pokemonDetails.id}")
                 Text(text = "Height: ${pokemonDetails.height}")
                 Text(text = "Weight: ${pokemonDetails.weight}")
             }
-        }
-    }
-}
-
-@Composable
-fun RecyclerView(pokemonList: List<PokemonDetails>) {
-    LazyColumn(modifier = Modifier.padding(10.dp)) {
-        items(items = pokemonList) { pokemon ->
-            PokemonItem(pokemonDetails = pokemon)
         }
     }
 }
